@@ -32,7 +32,6 @@ auto process(const std::vector<char>& banks){
     std::unordered_map<std::vector<char>,int,bank_hash_t> seen;
     std::vector<char> new_banks = banks;
 
-    bool seen_once = false;
     bool seen_twice = false;
     int cycles = 0;
 
@@ -46,9 +45,7 @@ auto process(const std::vector<char>& banks){
             new_banks[(start+i) % new_banks.size()]++; 
         }
 
-        seen_once |= seen[new_banks] > 0;
         seen_twice = seen[new_banks] > 1;
-
         seen[new_banks]++;
         cycles++;
     };
