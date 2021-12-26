@@ -27,8 +27,8 @@ struct bank_hash_t{
     }
 };
 
-auto process(const std::vector<char>& banks){
-    
+auto process(const std::vector<char>& banks)
+{
     std::unordered_map<std::vector<char>,int,bank_hash_t> seen;
     std::vector<char> new_banks = banks;
 
@@ -66,5 +66,4 @@ void main()
 
     std::cout << "part2: " << test.second << std::endl;
     std::cout << "part2: " << actual.second << std::endl;
-
 }
