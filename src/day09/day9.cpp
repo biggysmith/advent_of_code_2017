@@ -76,5 +76,5 @@ void main()
     auto [count, score, non_cancelled] = process(actual_values);
 
     std::cout << "part1: " << score << std::endl;
-    std::cout << "part1: " << non_cancelled << std::endl;
+    std::cout << "part2: " << non_cancelled << std::endl;
 }
