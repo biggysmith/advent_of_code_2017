@@ -4,7 +4,6 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include <stack>
 
 std::string load_input(const std::string& file){
     std::string ret;
@@ -15,8 +14,8 @@ std::string load_input(const std::string& file){
 
 auto process(const std::string& line)
 {
-    std::stack<char> stack;
-    std::stack<char> garbage_stack;
+    int stack_size = 0;
+    bool garbage = false;
 
     int group_count = 0;
     int group_score = 0;
@@ -32,36 +31,36 @@ auto process(const std::string& line)
         }
 
         if (c == '<') 
-        { 
-            if(garbage_stack.empty()){
-                garbage_stack.push(c);
+        {
+            if(!garbage){
+                garbage = true;
             }else{
                 garbage_count++;
             }
         } 
         else if (c == '>') 
         { 
-            garbage_stack.pop(); 
+            garbage = false;
         } 
         else if (c == '{') 
-        { 
-            if(garbage_stack.empty()){
-                stack.push(c);
+        {
+            if(!garbage){
+                stack_size++;
             }else{
                 garbage_count++;
             }
         }
         else if (c == '}') 
-        { 
-            if(garbage_stack.empty()){
+        {
+            if(!garbage){
                 group_count++;
-                group_score += (int)stack.size();
-                stack.pop();
+                group_score += stack_size;
+                stack_size--;
             }else{
                 garbage_count++;
             }
         }
-        else if(!garbage_stack.empty())
+        else if(garbage)
         {
             garbage_count++;
         }
