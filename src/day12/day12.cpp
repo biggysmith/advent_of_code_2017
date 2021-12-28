@@ -64,7 +64,7 @@ auto process(const graph_t& graph)
         }
 
         if(src == 0){
-            src0_count = std::count_if(visited.begin(), visited.end(), [](auto& a){
+            src0_count = (int)std::count_if(visited.begin(), visited.end(), [](auto& a){
                 return a.second;  
             });
         }
