@@ -43,9 +43,9 @@ struct program_t
             return (s[0]>='a' && s[0]<='z') ? regs[s] : std::stoll(s);
         };
 
-        while(i < instructions.size())
+        while(ipos < instructions.size())
         {
-            auto& ins = instructions[i];
+            auto& ins = instructions[ipos];
 
             if(ins.op == "snd"){
                 snd.push(get(ins.x));
@@ -67,11 +67,11 @@ struct program_t
                 }
             }else if(ins.op == "jgz"){
                 if(get(ins.x) > 0){
-                    i += get(ins.y) - 1;
+                    ipos += get(ins.y) - 1;
                 }
             }
 
-            i++;
+            ipos++;
         }
     }
 
@@ -81,7 +81,7 @@ struct program_t
 
     const std::vector<instruction_t>& instructions;
     std::map<std::string,int64_t> regs;
-    size_t i = 0;
+    size_t ipos = 0;
 };
 
 int64_t part1(const std::vector<instruction_t>& instructions)
@@ -105,7 +105,7 @@ int64_t part2(const std::vector<instruction_t>& instructions)
     do{
        prog0.run(rcv, snd);
        prog1.run(snd, rcv);
-    }while(!rcv.empty() || !snd.empty());
+    } while(!rcv.empty() || !snd.empty());
 
     return prog1.messages_sent();
 }
