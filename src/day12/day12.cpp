@@ -37,13 +37,12 @@ graph_t load_input(const std::string& file){
     return ret;
 }
 
-void dfs(int village, const graph_t& graph, std::map<int,bool>& visited, int& src_count){
+void dfs(int village, const graph_t& graph, std::map<int,bool>& visited){
     visited[village] = true;
 
     for(auto& dst : graph.at(village)){
         if(!visited[dst]){
-            dfs(dst, graph, visited, src_count);
-            src_count++;
+            dfs(dst, graph, visited);
         }
     }
 }
@@ -55,18 +54,23 @@ auto process(const graph_t& graph)
         visited[src] = false;
     }
 
+    int src0_count = 0;
     int group_count = 0;
-    std::map<int,int> src_count;
 
     for(auto& [src,_] : graph){
-        src_count[src] = 1;
         if(!visited[src]){
-            dfs(src, graph, visited, src_count[src]);
+            dfs(src, graph, visited);
             group_count++;
+        }
+
+        if(src == 0){
+            src0_count = std::count_if(visited.begin(), visited.end(), [](auto& a){
+                return a.second;  
+            });
         }
     }
 
-    return std::make_pair(src_count[0], group_count);
+    return std::make_pair(src0_count,group_count);
 }
 
 void main()
