@@ -40,31 +40,26 @@ void find_bridge(const std::vector<component_t>& components, const std::vector<c
     for(auto& com : components){
         if(std::find(path.begin(), path.end(), com) == path.end()){ // not present in path
 
+            auto extend = [&](int use){
+                auto new_path = path;
+                new_path.push_back({ com.port0, com.port1, use });
+                final_paths.push_back(new_path);
+                find_bridge(components,new_path,final_paths);
+            };
+
             if(last.used_port == 0){
                 if(last.port1 == com.port0){
-                    auto new_path = path;
-                    new_path.push_back({ com.port0, com.port1, 0 });
-                    final_paths.push_back(new_path);
-                    find_bridge(components,new_path,final_paths);
+                    extend(0);
                 }else if(last.port1 == com.port1){
-                    auto new_path = path;
-                    new_path.push_back({ com.port0, com.port1, 1 });
-                    final_paths.push_back(new_path);
-                    find_bridge(components,new_path,final_paths);
+                    extend(1);
                 }
             }
 
             if(last.used_port == 1){
                 if(last.port0 == com.port0){
-                    auto new_path = path;
-                    new_path.push_back({ com.port0, com.port1, 0 });
-                    final_paths.push_back(new_path);
-                    find_bridge(components,new_path,final_paths);
+                    extend(0);
                 }else if(last.port0 == com.port1){
-                    auto new_path = path;
-                    new_path.push_back({ com.port0, com.port1, 1 });
-                    final_paths.push_back(new_path);
-                    find_bridge(components,new_path,final_paths);
+                    extend(1);
                 }
             }
 
@@ -100,11 +95,6 @@ auto process(const std::vector<component_t>& components)
         }
     }
 
-    /*std::cout << std::endl;
-    for(auto& path : final_paths){
-        print_path(path);
-    }*/
-
     int max_strength = 0;
     for(auto& path : final_paths){
         max_strength = std::max(max_strength, strength(path));
@@ -128,8 +118,6 @@ auto process(const std::vector<component_t>& components)
 
     return std::make_pair(max_strength, max_strength2);
 }
-
-
 
 void main()
 {
