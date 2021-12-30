@@ -91,13 +91,11 @@ rules_t load_input(const std::string& file){
         pattern_out.width = (int)sqrt(pattern_out.rows.size());
 
         // map all rotations/flips to output pattern (group p4g so 8 unique orientations, 4rots * 2flips)
-        ret[pattern_in] = pattern_out;
-        for(int i=1; i<4; ++i){
+        for(int i=0; i<4; ++i){
              ret[rotate(pattern_in, i)] = pattern_out;
         }
         pattern_t flipped = flip(pattern_in, 0);
-        ret[flipped] = pattern_out;
-        for(int i=5; i<8; ++i){
+        for(int i=0; i<4; ++i){
             ret[rotate(flipped, i)] = pattern_out;
         }
     }   
