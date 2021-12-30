@@ -88,7 +88,7 @@ int strength(const std::vector<component_t>& path){
     return sum;
 }
 
-auto part1(const std::vector<component_t>& components)
+auto process(const std::vector<component_t>& components)
 {
     std::vector<std::vector<component_t>> final_paths;
 
@@ -110,23 +110,38 @@ auto part1(const std::vector<component_t>& components)
         max_strength = std::max(max_strength, strength(path));
     }
 
-    return max_strength;
+    std::vector<std::vector<component_t>> longest_paths;
+    int max_length = 0;
+    for(auto& path : final_paths){
+        if(path.size() > max_length){
+            max_length = (int)path.size();
+            longest_paths.clear();
+        }else if(path.size() == max_length){
+            longest_paths.push_back(path);
+        }
+    }
+
+    int max_strength2 = 0;
+    for(auto& path : longest_paths){
+        max_strength2 = std::max(max_strength2, strength(path));
+    }
+
+    return std::make_pair(max_strength, max_strength2);
 }
 
-auto part2(const std::vector<component_t>& components)
-{
 
-    return 0;
-}
 
 void main()
 {
     auto test_values = load_input("../src/day24/example_input.txt");
     auto actual_values = load_input("../src/day24/input.txt");
 
-    std::cout << "part1: " << part1(test_values) << std::endl;
-    std::cout << "part1: " << part1(actual_values) << std::endl;
+    auto test = process(test_values);
+    auto actual = process(actual_values);
 
-    /*std::cout << "part2: " << part2(test_values) << std::endl;
-    std::cout << "part2: " << part2(actual_values) << std::endl;*/
+    std::cout << "part1: " << test.first << std::endl;
+    std::cout << "part1: " << actual.first << std::endl;
+
+    std::cout << "part2: " << test.second << std::endl;
+    std::cout << "part2: " << actual.second << std::endl;
 }
