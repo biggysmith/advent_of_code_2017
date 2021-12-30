@@ -22,10 +22,17 @@ struct pattern_t{
     int width;
 };
 
-struct rule_t{
-    std::array<pattern_t,8> in;
-    pattern_t out;
+bool operator==(const pattern_t& a,const pattern_t& b){
+    return a.rows == b.rows;
+}
+
+struct pattern_hash{
+    size_t operator()(const pattern_t& pattern) const{
+        return std::hash<std::string>()(pattern.rows);
+    }
 };
+
+using rules_t = std::unordered_map<pattern_t,pattern_t,pattern_hash>;
 
 pattern_t start_pattern(){
     pattern_t ret;
@@ -68,34 +75,38 @@ pattern_t flip(const pattern_t& pattern, int n)
     return new_pattern;
 }
 
-std::vector<rule_t> load_input(const std::string& file){
-    std::vector<rule_t> ret;
+rules_t load_input(const std::string& file){
+    rules_t ret;
     std::ifstream fs(file);
     std::string line;
     std::string arrow;
     while(std::getline(fs, line)){
-        rule_t rule;
+        pattern_t pattern_in;
+        pattern_t pattern_out;
         std::stringstream ss(line);
-        ss >> rule.in[0].rows >> arrow >> rule.out.rows;
-        rule.in[0].rows.erase(std::remove(rule.in[0].rows.begin(), rule.in[0].rows.end(), '/'), rule.in[0].rows.end());
-        rule.out.rows.erase(std::remove(rule.out.rows.begin(), rule.out.rows.end(), '/'), rule.out.rows.end());
-        rule.in[0].width = (int)sqrt(rule.in[0].rows.size());
-        rule.out.width = (int)sqrt(rule.out.rows.size());
+        ss >> pattern_in.rows >> arrow >> pattern_out.rows;
+        pattern_in.rows.erase(std::remove(pattern_in.rows.begin(), pattern_in.rows.end(), '/'), pattern_in.rows.end());
+        pattern_out.rows.erase(std::remove(pattern_out.rows.begin(), pattern_out.rows.end(), '/'), pattern_out.rows.end());
+        pattern_in.width = (int)sqrt(pattern_in.rows.size());
+        pattern_out.width = (int)sqrt(pattern_out.rows.size());
+
+        // map all rotations/flips to output pattern (group p4g so 8 unique orientations, 4rots * 2flips)
+        ret[pattern_in] = pattern_out;
         for(int i=1; i<4; ++i){
-            rule.in[i] = rotate(rule.in[0], i);
+             ret[rotate(pattern_in, i)] = pattern_out;
         }
-        rule.in[4] = flip(rule.in[0], 0);
+        pattern_t flipped = flip(pattern_in, 0);
+        ret[flipped] = pattern_out;
         for(int i=5; i<8; ++i){
-            rule.in[i] = rotate(rule.in[4], i);
+            ret[rotate(flipped, i)] = pattern_out;
         }
-        ret.push_back(rule);
     }   
 
     return ret;
 }
 
 
-auto process(const std::vector<rule_t>& rules, int iters)
+auto process(const rules_t& rules, int iters)
 {
     pattern_t pattern = start_pattern();
 
@@ -120,18 +131,11 @@ auto process(const std::vector<rule_t>& rules, int iters)
                     }
                 }
 
-                bool found = false;
-                for(int r=0; !found && r<rules.size(); ++r){
-                    for(int i=0; !found && i<8; ++i){
-                        if(rules[r].in[i].rows == sub_pattern.rows){
-                            found = true;
-                            for(int sy=0; sy<new_w; ++sy){
-                                for(int sx=0; sx<new_w; ++sx){
-                                    new_pattern.get(gx*new_w+sx,gy*new_w+sy) = rules[r].out.get(sx,sy);
-                                }
-                            }
+                const pattern_t& out = rules.at(sub_pattern);
 
-                        }
+                for(int sy=0; sy<new_w; ++sy){
+                    for(int sx=0; sx<new_w; ++sx){
+                        new_pattern.get(gx*new_w+sx,gy*new_w+sy) = out.get(sx,sy);
                     }
                 }
 
